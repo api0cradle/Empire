@@ -1,5 +1,10 @@
 data/empire.db
-./data/empire.pem
+data/empire.pem
 empire.debug
 *.pyc
 downloads/*
+.vscode/*
+*.txt
+LastTask*
+setup/xar*
+setup/bomutils/*

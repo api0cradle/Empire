@@ -1,7 +1,258 @@
+Running
+--------
+- Added Trollsploit module Get-Schwifty
+
+5/15/2017
+---------
+-Version 2.0 Master Release
+	-Merge of Empyre and Empire projects
+	-Fix REST API
+	-Add Dropbox Listener
+	-Add support for IPv6 agents and listener
+	-Add DCOM lateral movement module
+	-Add module - Sudo Piggyback + Mail Persistence + Bash Profile Backdoor #357
+	-Add USB ETW Keylogger #396
+	-Fix dcos modules and fixed pyinstaller  #403
+	-Fix agent staging over http_hop listeners #404
+	-Fixed Get-SPNTicket multiple user SPNs bug #405
+	-Fix issue with Invoke-Shellcode Meterpreter stager #414
+	-Fix code_execution/invoke_reflectivepeinjection hangs empire if an invalid path is provided to DllPath #421
+	-Fix for PowerShell code in Invoke-PSInject too long #423
+	-Fix for agent shell commands #424
+	-Fix prompt line wrapping #430
+	-Fix screenshot module #435
+	-Add PowerUpSQL Modules #437
+	-Add module to monitor TCP connections #438
+	-Fix DLL stager #449
+	-Add VNC Inject #452
+	-Add HTTP headers to avoid proxy caching #455
+	-Fix hard-coded path in the OSX screenshot module. #465
+	-Add a module for wlrmdr.exe popup #472
+	-Add a module for SOCKSv5 proxy #478
+	-Fix bug in HTTP handler that can throw exceptions while parsing Cookies #479
+	-Add a BashBunny HID stager #480
+	-Update Inveigh 1.3.1 Modules #483
+	-Add support for Arch Linux and rejigged the Unknown distro option #484
+	-Fix for issue #420 non-ascii bug #489
+	-Fix the listeners API call #490
+	-Fix PKCS7 padding to be RFC compliant #492
+	-Add custom headers if any #495
+	-Fix using netifaces() for getting iface #496
+	-Add Session Gopher module
+	-Fix for issue 340 Added pip install setuptools and apt-get install libssl-dev
+
+
+9/23/2016
+---------
+-Version 2.0.0 beta, DerbyCon release
+
+-Listeners abstracted out to modules
+    -Flask used for listener/http instead of base http server
+    -client key negotiation abstracted out and implemented in agents
+
+-New nested "routing/metadata" packet structure introduced in prep for additional transports
+    -all packetes now wrapped with an HMAC'ed RC4 "routing" packet that uses the staging key
+        -this is so all agents can decrypt 'routing' information for future p2p comms 
+    -increases flexibilty for malleable comms (i.e. sessionid removed from POST requests)
+    -removes the need to keep track of which URIs are used for tasking/post/staging
+
+-Agent data handling improved and abstracted away for listener module use
+    -handle_agent_data() handles raw packets, usable by any listener module
+        -handle_agent_staging() handles agent key exchange/staging
+        -handle_agent_request() handles an agent tasking request
+        -handle_agent_response() handles an agent result response
+
+-EmPyre integration:
+    -Start of integration of EmPyre staging/comms implemented in listeners/http
+    -Agent is language-aware:
+        "interact AGENT" drops you into the language-appropriate agent menu
+        "usemodule [tab]" from an agent only tab-completes language-appropriate modules
+    -stagers were broken out into operating system designations:
+        -stagers.generate_launcher() now accepts a language specification, which wraps
+            the stager generation functionality for listener module
+
+-PowerShell:
+    -RC4 implemented for first stage obfuscation
+    -staging now uses HMAC and nonces
+    -epoch-syncing removed
+    -core agent cleanup
+
+-Listeners:
+    added http
+    added http_foreign (for 'foreign' Emire listeners)
+    added meterpreter (for meterpreter/cobalt strike, using Invoke-Shellcode)
+    added management/switch_listener module which switches an agent to a new listener module comms
+    redid hop listeners, added listeners/http_hop
+    added listeners/http_com which uses IE com objects for communications
+
+-Tons of bug fixes (and new bug introductions :)
+-Removed lots of code rot
+-Vastly increased debugging output (--debug 2)
+-New 'Language'/'MinLanguageVersion' options added to modules
+-stagers now have a 'language' option, and are folder-separated by operating system
+-added @mattifestation's AMSI bypass into PowerShell stagers 'safe checks'
+-redid PowerShell jobs architecture to use a separate app domain instead of PowerShell jobs
+-Added key reneogitation in case agents are 'orphaned'
+-moved stager.ps1/stager.py to ./agent/stagers/http.ps1 / ./agent/stagers/http.py
+-agent generation now patches in the comms methods into the base agent.ps1 (need to do agent.py)
+-powershell listeners are now properly hot-swappable with management/switch_listener
+-the external/generate_agent module will now generate a staged agent and preregister it (only for PowerShell at this time)
+-PowerView code updated
+-PowerUp code updated
+-new tables -> results and taskings to separate out stuff for the RESTful API 
+-CLI/RESTful API broken, needs testing
+
+
+7/20/2016
+---------
+-Version 1.5.3
+-Fix for issue #273 - added hostnames to raw screenshot output file
+-Fix for issue #285 - credential export supporting commas
+-Start of code standardization/pep8 cleanup - mods to agents.py, empire.py, and credentials.py
+-moved collection/keethief to collection/vaults/keethief
+-added collection/vaults/find_keepass_config to enumerate KeePass configs on a system
+-added collection/vaults/add_keepass_config_trigger to add a trigger backdoor to all reachable KeePass instances
+-added collection/vaults/get_keepass_config_trigger to enumerate all triggers for all reachable KeePass instances
+-added collection/vaults/remove_keepass_config_trigger to remove all triggers for all reachable KeePass instances
+-Misc. bug fixes
+
+7/16/2016
+---------
+-Added collection/keethief module to pilfer KeePass key material from memory
+-"creds X" now searches additional fields for the term (like domain)
+-merged credentials/enum_cred_store from @BeetleChunks
+
+7/15/2016
+---------
+-Merged @rvrsh3ll's collection/browser_data module
+-Merged @curi0usJack's situational_awareness/network/smbautobrute module
+-fix for issue #258 - "interact AGENT" now works globally in every menu except an active agent menu
+-fix for issue #221 - hop listeners
+-fix for issue #252 - management/invoke_script now no longer requires an external script
+-fix for issue #257 - sysinfo now executed after running the steal_token command 
+
+6/24/2016
+---------
+-Updated Invoke-Mimikatz to include a fix for multi-cpu boxes/processor detection
+-Merged @n0clues pull request to change paths from %TEMP% to %PUBLIC% for spawnas module to fix a bug when spawning as a different user.
+-Fixed a typo in the dcsync_hashdump that caused it to crash the Empire server
+-Merged in Inveigh 1.1.1 and current Tater build thanks to @Kevin-Robertson
+-Fixed a bug in the REST API due to the port being a string and not an int
+-Added 417 Expectation failed error bug fix for older proxies (Squid) thanks to @i223t
+
+6/9/2016
+---------
+-Updated SQLite dll for Get-ChromeDump.ps1
+
+5/27/2016
+---------
+-Fixed format issues with Get-ComputerDetails.ps1
+-More verbose output added to PowerUp's Invoke-ServiceCMD 
+-Made Get-SPN PowerShell 2.0 compatible 
+-Updated RunAs to include an argument parameter
+-Merged @tristandostaler's /api/map feature to the Rest API
+-Merged in @andrew-morris's installer update to include -Y switch for apt-get commands
+-Merged in MS16-032 local privesc from @leoloobeek
+
+5/4/2016
+---------
+-Merged @jaredhaight's Invoke-MetasploitModule module
+
+5/2/2016
+---------
+-tightened up argparse validation
+
+4/24/2016
+---------
+-Added credentials/get_spn_tickets to request SPN tickets.
+-Added credentials/mimikatz/extract_tickets
+
+4/21/2016
+---------
+-Merged @Subtee's regsvc32 (sct) stager
+
+4/1/2016
+---------
+-listener starting now returns more verbose errors on failure in console and API
+-merge of @mynameisiv's .jpg screenshot PR
+-Fix for path errors in some cases for ./setup/setup_database.py
+
+============
+3/31/2015 - RELEASE 1.5
+============
+-Encompasses all changes since the 1.4 tagged release
+
+
+3/31/2016
+---------
+-Merge of Inveigh 1.1 update and privesc/tater
+-Updated of Invoke-Mimikatz.ps1 source
+-Updated mimikatz dlls to version 2.1 alpha
+-Included modification to suppress cmd.exe when spawned via PTH.
+
+3/30/2016
+---------
+-Added loading of external modules with 'load /path/modules/'
+
+3/25/2016
+---------
+-RESTful API modifications
+-expanded agent/server epoch check to +/- 12 hours
+-stagers now run -sta
+
+3/24/2016
+---------
+-RESTful API modifications
+
+3/22/2016
+---------
+-added auth to RESTful API, additional API fixes
+
+3/21/2016
+---------
+-start of RESTful API implementation
+
+3/19/2016
+---------
+-PowerView.ps1 update and multiple related module additions
+-added github issue templates
+-added situational_awareness/network/powerview/get_gpo_computer
+
+3/11/2016
+---------
+-added privesc/getsystem
+-bug fix for Invoke-PsExec and some x64 pointers
+
+3/3/2016
+---------
+-first pass at stager retry interval
+-download chunking modified
+
+2/17/2016
+---------
+- '--debug 2' now displays debug information to the console as well as the empire.debug file
+-added privesc/mcafee_sitelist
+
+1/15/2016
+---------
+-start of command line option integration, use './empire -h' to see options
+-bug fixes
+-'searchmodule' with no arguments now lists all modules
+
+1/14/2016
+---------
+-Fix for some UTF-8 encoding issues
+
+1/10/2016
+----------
+-Corrected several bugs in how the workingHours window is handled in the agent
+
+
 ============
 12/29/2015 - RELEASE 1.4
 ============
 -Encompasses all changes since 1.3.1 tagged release
+
 
 12/29/2015
 ----------
@@ -98,15 +349,18 @@
 ---------
 -Fixed small bug in TASK_CMD_WAIT response parsing
 
+
 ============
 10/30/2015 - RELEASE 1.3.1
 ============
 -Updated reflectivepick dlls to fix bug in injection and dll payload injection
 
+
 ============
 10/29/2015 - RELEASE 1.3
 ============
 -Encompasses all changes since 1.2 tagged release
+
 
 10/26/2015
 ----------
@@ -144,6 +398,7 @@
 --- Numerous bug fixes and UI tweaks throughout code
 --- Six new modules and WAR stager added, /sids option added to golden_ticket
 --- Fixed international locale bug with unicode text in agent.ps1
+
 
 8/29/2015
 ---------
@@ -191,6 +446,7 @@
 --- Extra modules added and HTA stager
 --- Ability for agents to die after certain number of failed checkins
 --- Added ability to easily remove "stale" agents
+
 
 8/15/2015
 ---------
